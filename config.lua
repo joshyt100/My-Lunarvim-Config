@@ -1,15 +1,17 @@
--- Read the docs: https://www.lunarvim.org/docs/configuration
-
-
 -- Video Tutorials: https://www.youtube.com/watch?v=sFA9kX-Ud_c&list=PLhoH5vyxr6QqGu0i7tt_XoVK9v-KvZ3m6
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
 lvim.transparent_window = true
-lvim.lsp.document_highlight = false
+--lvim.lsp.document_highlight = false
 lvim.log.level = "error"
-lvim.builtin.treesitter.highlight.enable = true
-
-
+local components = require("lvim.core.lualine.components")
+lvim.builtin.lualine.style = "default"
+lvim.builtin.lualine.sections.lualine_c = { components.filename, components.location }
+lvim.builtin.lualine.sections.lualine_z = { components.diagnostics }
+lvim.builtin.lualine.sections.lualine_x = { components.python_env, components.filetype }
+lvim.builtin.lualine.sections.lualine_y = { components.lsp, components.diff }
+lvim.builtin.lualine.sections.lualine_b = { components.branch }
+vim.opt.cmdheight = 0
 -- Read the docs: https://www.lunarvim.org/docs/configuration
 -- Video Tutorials: https://www.youtube.com/watch?v=sFA9kX-Ud_c&list=PLhoH5vyxr6QqGu0i7tt_XoVK9v-KvZ3m6
 -- Forum: https://www.reddit.com/r/lunarvim/
@@ -42,6 +44,25 @@ lvim.plugins = {
     opts = {
       flavour = "mocha",
     },
+    --codium
+    {
+      'Exafunction/codeium.vim',
+      event = 'BufEnter'
+    },
+
+  },
+  {
+    'craftzdog/solarized-osaka.nvim',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require("solarized-osaka").setup({
+        styles = {
+          floats = "transparent"
+        },
+      })
+      vim.cmd [[colorscheme solarized-osaka]]
+    end
   },
 
   "mfussenegger/nvim-dap-python",
@@ -50,20 +71,22 @@ lvim.plugins = {
   { "folke/tokyonight.nvim", name = "tokyonight" },
   { "luisiacc/gruvbox-baby", name = "gruvbox" },
   --tabnine
-  {
-    "tzachar/cmp-tabnine",
-    event = "BufRead",
-    build = "./install.sh",
-  },
+  -- {
+  --   "tzachar/cmp-tabnine",
+  --   event = "BufRead",
+  --   build = "./install.sh",
+  -- },
   "rebelot/kanagawa.nvim",
   "pineapplegiant/spaceduck",
   "nyngwang/nvimgelion",
   { "sainnhe/gruvbox-material", name = "gruvbox_other" }
 
 }
-lvim.builtin.lualine.sections.lualine_a = { "mode" }
+lvim.builtin.lualine.options.theme = "seoul256"
+
+
 lvim.format_on_save.enabled = true
-lvim.colorscheme = "gruvbox-baby"
+lvim.colorscheme = "solarized-osaka"
 lvim.format_on_save.pattern = { "*.lua", "*.css", " *.html", "*.py", "*.cpp", "*.js" }
 --vim.g.user_emmet_leader_key = ',' -- Customize the leader key according to your preference
 lvim.builtin.treesitter.ensure_installed = {
@@ -104,6 +127,7 @@ end)
 
 local linters = require "lvim.lsp.null-ls.linters"
 linters.setup { { command = "flake8", filetypes = { "python" } } }
+
 
 
 
@@ -219,7 +243,7 @@ formatters.setup({
 --require("lvim.lsp.manager").setup("tailwindcss",opts)
 
 
-lvim.builtin.treesitter.highlight.enable = true
+--lvim.builtin.treesitter.highlight.enable = true
 
 -- auto install treesitter parsers
 lvim.builtin.treesitter.ensure_installed = { "cpp", "c" }
@@ -293,41 +317,6 @@ local opts = {
   on_init = custom_on_init,
 }
 
-require("lvim.lsp.manager").setup("clangd", opts)
 
 -- install codelldb with :MasonInstall codelldb
 -- configure nvim-dap (codelldb)
-lvim.builtin.dap.on_config_done = function(dap)
-  dap.adapters.codelldb = {
-    type = "server",
-    port = "${port}",
-    executable = {
-      -- provide the absolute path for `codelldb` command if not using the one installed using `mason.nvim`
-      command = "codelldb",
-      args = { "--port", "${port}" },
-
-      -- On windows you may have to uncomment this:
-      -- detached = false,
-    },
-  }
-
-  dap.configurations.cpp = {
-    {
-      name = "Launch file",
-      type = "codelldb",
-      request = "launch",
-      program = function()
-        local path
-        vim.ui.input({ prompt = "Path to executable: ", default = vim.loop.cwd() .. "/build/" }, function(input)
-          path = input
-        end)
-        vim.cmd [[redraw]]
-        return path
-      end,
-      cwd = "${workspaceFolder}",
-      stopOnEntry = false,
-    },
-  }
-
-  dap.configurations.c = dap.configurations.cpp
-end -- Additional Plugins
