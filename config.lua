@@ -51,6 +51,7 @@ lvim.plugins = {
     },
 
   },
+  "mfussenegger/nvim-dap-python",
   {
     'craftzdog/solarized-osaka.nvim',
     lazy = false,
@@ -64,10 +65,6 @@ lvim.plugins = {
       vim.cmd [[colorscheme solarized-osaka]]
     end
   },
-
-  "mfussenegger/nvim-dap-python",
-  "nvim-neotest/neotest",
-  "nvim-neotest/neotest-python",
   { "folke/tokyonight.nvim", name = "tokyonight" },
   { "luisiacc/gruvbox-baby", name = "gruvbox" },
   --tabnine
@@ -76,12 +73,13 @@ lvim.plugins = {
   --   event = "BufRead",
   --   build = "./install.sh",
   -- },
+
   "rebelot/kanagawa.nvim",
   "pineapplegiant/spaceduck",
   "nyngwang/nvimgelion",
   { "sainnhe/gruvbox-material", name = "gruvbox_other" }
-
 }
+
 lvim.builtin.lualine.options.theme = "seoul256"
 
 
@@ -131,20 +129,6 @@ linters.setup { { command = "flake8", filetypes = { "python" } } }
 
 
 
-require("neotest").setup({
-  adapters = {
-    require("neotest-python")({
-      -- Extra arguments for nvim-dap configuration
-      -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
-      dap = {
-        justMyCode = false,
-        console = "integratedTerminal",
-      },
-      args = { "--log-level", "DEBUG", "--quiet" },
-      runner = "pytest",
-    })
-  }
-})
 
 lvim.builtin.which_key.mappings["dm"] = { "<cmd>lua require('neotest').run.run()<cr>",
   "Test Method" }
