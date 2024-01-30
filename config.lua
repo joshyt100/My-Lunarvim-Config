@@ -44,12 +44,36 @@ lvim.plugins = {
     opts = {
       flavour = "mocha",
     },
+    {
+      "kawre/leetcode.nvim",
+      build = ":TSUpdate html",
+      dependencies = {
+        "nvim-telescope/telescope.nvim",
+        "nvim-lua/plenary.nvim", -- required by telescope
+        "MunifTanjim/nui.nvim",
+
+        -- optional
+        "nvim-treesitter/nvim-treesitter",
+        "rcarriga/nvim-notify",
+        "nvim-tree/nvim-web-devicons",
+      },
+      opts = {
+        -- configuration goes here
+      },
+    },
     --codium
     {
+
       'Exafunction/codeium.vim',
-      event = 'BufEnter'
+      event = 'BufEnter',
+      config = function()
+        -- Change '<C-g>' here to any keycode you like.
+        -- Change '<C-g>' here to any keycode you like.
+        vim.keymap.set('i', '<C-g>', function() return vim.fn['codeium#Accept']() end, { expr = true, silent = true })
+      end
     },
 
+    -- lazy.nvim
   },
   "mfussenegger/nvim-dap-python",
   {
@@ -65,6 +89,23 @@ lvim.plugins = {
       vim.cmd [[colorscheme solarized-osaka]]
     end
   },
+  -- lazy.nvim
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- add any options here
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      "MunifTanjim/nui.nvim",
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      "rcarriga/nvim-notify",
+    }
+  },
+
   { "folke/tokyonight.nvim", name = "tokyonight" },
   { "luisiacc/gruvbox-baby", name = "gruvbox" },
   --tabnine
