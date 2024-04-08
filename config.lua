@@ -1,8 +1,11 @@
 -- Video Tutorials: https://www.youtube.com/watch?v=sFA9kX-Ud_c&list=PLhoH5vyxr6QqGu0i7tt_XoVK9v-KvZ3m6
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
+-- lvim.transparent_window = true
+-- vim.opt.guicursor = "n-v-i-c:block-Cursor"
 lvim.transparent_window = true
---lvim.lsp.document_highlight = false
+
+-- lvim.lsp.document_highlight = true
 lvim.log.level = "error"
 local components = require("lvim.core.lualine.components")
 lvim.builtin.lualine.style = "default"
@@ -29,21 +32,27 @@ vim.opt.cmdheight = 0
 --require('lspconfig').emmet_ls.setup{}
 -- chadrc.lua
 -- ... (other configurations)
-
 -- Emmet Language Server settings
 -- -- lv-config.lua
-
 -- ... (other configurations)
+require("notify").setup({
+  background_colour = "#000000",
+})
+
 --
 --Marksman
 require("lvim.lsp.manager").setup("marksman")
 lvim.plugins = {
+  'shaunsingh/nord.nvim',
+  "daschw/leaf.nvim",
+  { "rose-pine/neovim",      name = "rose-pine" },
   {
     "catppuccin/nvim",
     name = "catppuccin",
     opts = {
       flavour = "mocha",
     },
+
     {
       "kawre/leetcode.nvim",
       build = ":TSUpdate html",
@@ -76,6 +85,8 @@ lvim.plugins = {
     -- lazy.nvim
   },
   "mfussenegger/nvim-dap-python",
+  "nvim-neotest/neotest",
+  "nvim-neotest/neotest-python",
   {
     'craftzdog/solarized-osaka.nvim',
     lazy = false,
@@ -89,44 +100,50 @@ lvim.plugins = {
       vim.cmd [[colorscheme solarized-osaka]]
     end
   },
+  "zortax/three-firewatch",
   -- lazy.nvim
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy",
-    opts = {
-      -- add any options here
-    },
-    dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-      "MunifTanjim/nui.nvim",
-      -- OPTIONAL:
-      --   `nvim-notify` is only needed, if you want to use the notification view.
-      --   If not available, we use `mini` as the fallback
-      "rcarriga/nvim-notify",
-    }
-  },
+  -- {
+  --   "folke/noice.nvim",
+  --   event = "VeryLazy",
+  --   opts = {
+  --     -- add any options here
+  --   },
+  --   dependencies = {
+  --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+  --     "MunifTanjim/nui.nvim",
+  --     -- OPTIONAL:
+  --     --   `nvim-notify` is only needed, if you want to use the notification view.
+  --     --   If not available, we use `mini` as the fallback
+  --     "rcarriga/nvim-notify",
+  --   }
+  -- },
+  --
 
   { "folke/tokyonight.nvim", name = "tokyonight" },
   { "luisiacc/gruvbox-baby", name = "gruvbox" },
+  "liminalminds/icecream.nvim",
+
   --tabnine
   -- {
   --   "tzachar/cmp-tabnine",
   --   event = "BufRead",
   --   build = "./install.sh",
   -- },
+  "paulfrische/reddish.nvim",
 
   "rebelot/kanagawa.nvim",
   "pineapplegiant/spaceduck",
   "nyngwang/nvimgelion",
+  "drazil100/dusklight.vim",
+  "maxmx03/fluoromachine.nvim",
   { "sainnhe/gruvbox-material", name = "gruvbox_other" }
 }
-
-lvim.builtin.lualine.options.theme = "seoul256"
+lvim.builtin.lualine.options.theme = "tokyonight"
 
 
 lvim.format_on_save.enabled = true
-lvim.colorscheme = "solarized-osaka"
-lvim.format_on_save.pattern = { "*.lua", "*.css", " *.html", "*.py", "*.cpp", "*.js" }
+lvim.colorscheme = "gruvbox-material"
+lvim.format_on_save.pattern = { "*.lua", "*.css", "*.go", " *.html", "*.py", "*.cpp", "*.js" }
 --vim.g.user_emmet_leader_key = ',' -- Customize the leader key according to your preference
 lvim.builtin.treesitter.ensure_installed = {
   "python",
@@ -138,7 +155,7 @@ local pyright_opts = {
   settings = {
     pyright = {
       disableLanguageServices = false,
-      disableOrganizeImports = false,
+      disableOrganizeImports = true,
     },
     python = {
       analysis = {
@@ -151,22 +168,39 @@ local pyright_opts = {
     },
   },
 }
+local format = require "lvim.lsp.null-ls.formatters"
+format.setup {
+  { command = "goimports", filetypes = { "go" } },
+  { command = "gofumpt",   filetypes = { "go" } },
+}
 
 
 local formatters = require "lvim.lsp.null-ls.formatters"
-formatters.setup { { name = "black" }, }
+formatters.setup { { name = "black" },
+}
 
 lvim.builtin.dap.active = true
 local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
 pcall(function()
   require("dap-python").setup(mason_path .. "packages/debugpy/venv/bin/python")
 end)
+require("neotest").setup({
+  adapters = {
+    require("neotest-python")({
+      dap = {
+        justMyCode = false,
+        console = "integratedTerminal",
+      },
+      args = { "--log-level", "DEBUG", "--quiet" },
+      runner = "pytest",
+    })
+  }
+})
 
 
 
 local linters = require "lvim.lsp.null-ls.linters"
 linters.setup { { command = "flake8", filetypes = { "python" } } }
-
 
 
 
@@ -197,6 +231,9 @@ lsp_manager.setup("emmet_ls", {
   on_init = require("lvim.lsp").common_on_init,
   capabilities = require("lvim.lsp").common_capabilities(),
 })
+
+
+
 -- ... (other configurations)
 
 -- Optional: Use the built-in auto-formatting and linting
@@ -218,7 +255,6 @@ lvim.builtin.treesitter.ensure_installed = {
 
 -- Setup lsp.
 -- Set a linter.
-
 
 -- Additional Plugins
 -- local null_ls = require("null-ls")
