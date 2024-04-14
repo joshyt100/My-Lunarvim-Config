@@ -5,7 +5,7 @@
 -- vim.opt.guicursor = "n-v-i-c:block-Cursor"
 lvim.transparent_window = true
 
--- lvim.lsp.document_highlight = true
+lvim.lsp.document_highlight = true
 lvim.log.level = "error"
 local components = require("lvim.core.lualine.components")
 lvim.builtin.lualine.style = "default"
@@ -39,6 +39,7 @@ require("notify").setup({
   background_colour = "#000000",
 })
 
+
 --
 --Marksman
 require("lvim.lsp.manager").setup("marksman")
@@ -51,6 +52,21 @@ lvim.plugins = {
     name = "catppuccin",
     opts = {
       flavour = "mocha",
+    },
+    {
+      "folke/noice.nvim",
+      event = "VeryLazy",
+      opts = {
+        -- add any options here
+      },
+      dependencies = {
+        -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+        "MunifTanjim/nui.nvim",
+        -- OPTIONAL:
+        --   `nvim-notify` is only needed, if you want to use the notification view.
+        --   If not available, we use `mini` as the fallback
+        "rcarriga/nvim-notify",
+      }
     },
 
     {
@@ -138,11 +154,11 @@ lvim.plugins = {
   "maxmx03/fluoromachine.nvim",
   { "sainnhe/gruvbox-material", name = "gruvbox_other" }
 }
-lvim.builtin.lualine.options.theme = "tokyonight"
+lvim.builtin.lualine.options.theme = "gruvbox"
 
 
 lvim.format_on_save.enabled = true
-lvim.colorscheme = "gruvbox-material"
+lvim.colorscheme = "kanagawa-dragon"
 lvim.format_on_save.pattern = { "*.lua", "*.css", "*.go", " *.html", "*.py", "*.cpp", "*.js" }
 --vim.g.user_emmet_leader_key = ',' -- Customize the leader key according to your preference
 lvim.builtin.treesitter.ensure_installed = {
@@ -201,6 +217,25 @@ require("neotest").setup({
 
 local linters = require "lvim.lsp.null-ls.linters"
 linters.setup { { command = "flake8", filetypes = { "python" } } }
+
+require("noice").setup({
+  lsp = {
+    -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+    override = {
+      ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+      ["vim.lsp.util.stylize_markdown"] = true,
+      ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+    },
+  },
+  -- you can enable a preset for easier configuration
+  presets = {
+    bottom_search = true,         -- use a classic bottom cmdline for search
+    command_palette = true,       -- position the cmdline and popupmenu together
+    long_message_to_split = true, -- long messages will be sent to a split
+    inc_rename = false,           -- enables an input dialog for inc-rename.nvim
+    lsp_doc_border = false,       -- add a border to hover docs and signature help
+  },
+})
 
 
 
